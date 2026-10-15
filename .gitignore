@@ -9,8 +9,10 @@ venv/
 
 # ── Environment / secrets ─────────────────────────────────────────────────────
 .env
-.env.*
-!.env.example       # keep the example in Git
+.env.local
+.env.production
+.env.staging
+# .env.example is intentionally NOT ignored — it holds fake/safe values only
 
 # ── Node ──────────────────────────────────────────────────────────────────────
 node_modules/
