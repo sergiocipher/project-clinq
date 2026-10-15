@@ -1,0 +1,62 @@
+# WHY THIS FILE EXISTS:
+# Runs the full three-service stack locally with a single command.
+# - postgres: the database; a healthcheck ensures the backend waits until
+#   Postgres is genuinely ready (not just booted) before starting.
+# - backend: FastAPI; depends_on with service_healthy waits for Postgres.
+# - frontend: Nginx serving the React build; proxies /api to the backend.
+# Named volume pgdata persists the database across docker compose restarts.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-clinqdb}
+      POSTGRES_USER:     ${POSTGRES_USER:-clinquser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me-local-only}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      DATABASE_URL: >-
+        postgresql+psycopg://${POSTGRES_USER:-clinquser}:${POSTGRES_PASSWORD:-change-me-local-only}@postgres:5432/${POSTGRES_DB:-clinqdb}
+      APP_VERSION: ${APP_VERSION:-dev}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      # python:3.12-slim has no curl; use Python's stdlib urllib instead
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    environment:
+      BACKEND_URL: http://backend:8000
+    ports:
+      - "3000:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:
