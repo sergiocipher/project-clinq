@@ -1,0 +1,14 @@
+# WHY THIS FILE EXISTS:
+# Keeps the Docker build context small and prevents secrets/test artefacts
+# from leaking into the image layer.
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+tests/
+.env
+.env.*
+*.md
+.git/
+dist/
