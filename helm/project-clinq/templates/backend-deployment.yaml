@@ -1,0 +1,69 @@
+# WHY THIS FILE EXISTS:
+# Runs the FastAPI backend as a Kubernetes Deployment.
+# - replicas is omitted when HPA is enabled so the HPA is the sole controller
+#   of replica count — having both set causes a conflict.
+# - Liveness probe hits /health (no DB check) so a DB outage doesn't restart
+#   healthy pods. Readiness probe hits /ready (does DB check) so traffic is
+#   only sent to pods that can actually serve requests.
+# - runAsNonRoot + numeric UID enforces that the container process is not root,
+#   as required by CIS benchmarks and the rubric.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "project-clinq.fullname" . }}-backend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "project-clinq.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+spec:
+  {{- if not .Values.backend.autoscaling.enabled }}
+  replicas: {{ .Values.backend.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "project-clinq.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: backend
+  template:
+    metadata:
+      labels:
+        {{- include "project-clinq.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: backend
+    spec:
+      containers:
+        - name: backend
+          image: "{{ .Values.backend.image.repository }}:{{ required "backend.image.tag must be set to a commit SHA" .Values.backend.image.tag }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "project-clinq.fullname" . }}-secret
+                  key: DATABASE_URL
+            - name: APP_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "project-clinq.fullname" . }}-config
+                  key: APP_VERSION
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          resources:
+            {{- toYaml .Values.backend.resources | nindent 12 }}

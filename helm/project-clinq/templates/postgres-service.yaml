@@ -1,0 +1,21 @@
+# WHY THIS FILE EXISTS:
+# Gives the Postgres StatefulSet a stable DNS name inside the cluster.
+# The backend's DATABASE_URL uses this Service name as the host, so the
+# backend never needs to know the pod's IP address.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "project-clinq.fullname" . }}-postgres
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "project-clinq.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postgres
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "project-clinq.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: postgres
+  ports:
+    - port: 5432
+      targetPort: postgres
+      name: postgres

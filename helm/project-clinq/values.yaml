@@ -1,0 +1,52 @@
+# Default values for project-clinq.
+# image.tag is intentionally left empty — it MUST be supplied at install time
+# as a git commit SHA. The templates use `required` to enforce this.
+
+backend:
+  image:
+    repository: ghcr.io/sergiocipher/project-clinq-backend
+    tag: ""          # required — set to a git SHA at deploy time
+    pullPolicy: IfNotPresent
+  replicas: 2
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 50
+
+frontend:
+  image:
+    repository: ghcr.io/sergiocipher/project-clinq-frontend
+    tag: ""          # required — set to a git SHA at deploy time
+    pullPolicy: IfNotPresent
+  replicas: 2
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+postgres:
+  image: postgres:16-alpine
+  database: clinqdb
+  user: clinquser
+  password: ""       # required — passed via --set at deploy time
+  storage: 1Gi
+  storageClassName: ""
+
+ingress:
+  enabled: true
+  className: nginx
+  host: ""           # empty = match all hosts (use ELB hostname directly)
+
+serviceMonitor:
+  enabled: false     # set to true in values-eks.yaml after kube-prometheus-stack is installed

@@ -1,0 +1,14 @@
+project-clinq has been deployed!
+
+Get the application URL:
+  kubectl get ingress -n {{ .Release.Namespace }}
+
+Check pod status:
+  kubectl get pods -n {{ .Release.Namespace }}
+
+View backend logs:
+  kubectl logs -n {{ .Release.Namespace }} -l app.kubernetes.io/component=backend -f
+
+View the API docs:
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "project-clinq.fullname" . }}-backend 8000:8000
+  Open: http://localhost:8000/docs

@@ -1,0 +1,10 @@
+# WHY THIS FILE EXISTS:
+# Creates a dedicated Kubernetes namespace so all project-clinq resources are
+# isolated from other workloads on the cluster. Labels follow the standard
+# Kubernetes recommended label convention for tooling compatibility.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: project-clinq
+  labels:
+    app.kubernetes.io/name: project-clinq

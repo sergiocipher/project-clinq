@@ -1,0 +1,15 @@
+# WHY THIS FILE EXISTS:
+# Defines a gp3 StorageClass backed by the AWS EBS CSI driver.
+# gp3 is the current-generation EBS volume type — cheaper and faster than gp2.
+# WaitForFirstConsumer means the volume is provisioned in the same AZ as the
+# pod that claims it, avoiding cross-AZ latency and charges.
+# This StorageClass is NOT set as default so it doesn't interfere with other
+# workloads; Helm values-eks.yaml references it by name.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp3
+provisioner: ebs.csi.aws.com
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  type: gp3

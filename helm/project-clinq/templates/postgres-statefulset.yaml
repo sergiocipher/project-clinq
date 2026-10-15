@@ -1,0 +1,82 @@
+# WHY THIS FILE EXISTS:
+# Runs Postgres as a StatefulSet so it gets a stable network identity and a
+# persistent volume that survives pod restarts. A Deployment would lose data
+# every time the pod restarted because its storage is ephemeral.
+# PGDATA is set to a subdirectory to avoid the "lost+found" init failure that
+# occurs when EBS mounts a volume at the root of the data directory.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "project-clinq.fullname" . }}-postgres
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "project-clinq.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postgres
+spec:
+  serviceName: {{ include "project-clinq.fullname" . }}-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "project-clinq.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: postgres
+  template:
+    metadata:
+      labels:
+        {{- include "project-clinq.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: postgres
+    spec:
+      securityContext:
+        fsGroup: 999   # postgres group — ensures mounted volume is writable
+      containers:
+        - name: postgres
+          image: {{ .Values.postgres.image }}
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "project-clinq.fullname" . }}-config
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "project-clinq.fullname" . }}-config
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "project-clinq.fullname" . }}-secret
+                  key: POSTGRES_PASSWORD
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          ports:
+            - containerPort: 5432
+              name: postgres
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - $(POSTGRES_USER)
+                - -d
+                - $(POSTGRES_DB)
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: pgdata
+      spec:
+        accessModes: [ReadWriteOnce]
+        storageClassName: {{ .Values.postgres.storageClassName | quote }}
+        resources:
+          requests:
+            storage: {{ .Values.postgres.storage }}

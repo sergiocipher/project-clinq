@@ -1,0 +1,16 @@
+# WHY THIS FILE EXISTS:
+# Stores non-secret configuration that the backend pod reads as environment
+# variables. Keeping config in a ConfigMap (not baked into the image) means
+# you can change it without rebuilding. Secrets (DB password, DATABASE_URL)
+# live in secret.yaml, not here.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "project-clinq.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "project-clinq.labels" . | nindent 4 }}
+data:
+  POSTGRES_DB:   {{ .Values.postgres.database | quote }}
+  POSTGRES_USER: {{ .Values.postgres.user | quote }}
+  APP_VERSION:   {{ .Values.backend.image.tag | quote }}

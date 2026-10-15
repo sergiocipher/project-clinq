@@ -1,0 +1,28 @@
+# WHY THIS FILE EXISTS:
+# HorizontalPodAutoscaler automatically adds or removes backend pods based on
+# CPU usage. When load increases above 50% CPU, new pods are created (up to
+# maxReplicas). When load drops, pods are removed (down to minReplicas).
+# Requires the metrics-server to be running in the cluster.
+{{- if .Values.backend.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "project-clinq.fullname" . }}-backend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "project-clinq.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "project-clinq.fullname" . }}-backend
+  minReplicas: {{ .Values.backend.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.backend.autoscaling.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.backend.autoscaling.targetCPUUtilizationPercentage }}
+{{- end }}

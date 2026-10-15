@@ -1,0 +1,14 @@
+# Local Kubernetes rehearsal values (Docker Desktop / kind / minikube).
+# Use with: helm upgrade --install project-clinq ./helm/project-clinq \
+#   -f helm/project-clinq/values-dev.yaml \
+#   --set backend.image.tag=<SHA> --set frontend.image.tag=<SHA>
+
+postgres:
+  storageClassName: ""   # use cluster default (hostpath on Docker Desktop)
+  password: change-me-local-only
+
+ingress:
+  host: project-clinq.local   # add "127.0.0.1 project-clinq.local" to /etc/hosts
+
+serviceMonitor:
+  enabled: false

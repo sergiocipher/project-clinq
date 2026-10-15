@@ -1,0 +1,14 @@
+# EKS production values.
+# Use with: helm upgrade --install project-clinq ./helm/project-clinq \
+#   -f helm/project-clinq/values-eks.yaml \
+#   --set backend.image.tag=<SHA> --set frontend.image.tag=<SHA> \
+#   --set postgres.password=<SECRET>
+
+postgres:
+  storageClassName: gp3   # EBS gp3 — created by k8s/storageclass-gp3.yaml
+
+ingress:
+  host: ""   # empty = no host rule, so the raw ELB hostname works directly
+
+serviceMonitor:
+  enabled: true   # enable after kube-prometheus-stack is installed

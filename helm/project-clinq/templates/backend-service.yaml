@@ -1,0 +1,21 @@
+# WHY THIS FILE EXISTS:
+# ClusterIP Service for the backend — gives it a stable internal hostname.
+# The frontend's Nginx proxies /api/ to this Service. ClusterIP means it is
+# only reachable inside the cluster; the Ingress routes external traffic to it.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "project-clinq.fullname" . }}-backend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "project-clinq.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "project-clinq.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
