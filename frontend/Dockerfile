@@ -23,7 +23,16 @@ COPY . .
 RUN npm run build
 
 # ── Stage 2: runtime ──────────────────────────────────────────────────────────
-FROM nginxinc/nginx-unprivileged:1.27-alpine
+# 1.30.1-alpine3.23 ships with patched openssl/musl/libxml2/etc that clear all
+# HIGH/CRITICAL CVEs found in 1.27-alpine (Alpine 3.21.3).
+# The `apk upgrade` step ensures any packages patched after the image was
+# published are also updated — belt-and-suspenders against mid-release CVEs.
+FROM nginxinc/nginx-unprivileged:1.30.1-alpine3.23
+
+# Upgrade all OS packages to their latest patched versions
+USER root
+RUN apk upgrade --no-cache
+USER 101
 
 # BACKEND_URL is substituted into default.conf.template by the Nginx entrypoint
 ENV BACKEND_URL=http://backend:8000
