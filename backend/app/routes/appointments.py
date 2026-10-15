@@ -27,9 +27,7 @@ def get_stats(db: Session = Depends(get_db)):
     total = db.scalar(select(func.count()).select_from(Appointment)) or 0
 
     # Count per status, ensuring every status appears (even with zero)
-    rows = db.execute(
-        select(Appointment.status, func.count()).group_by(Appointment.status)
-    ).all()
+    rows = db.execute(select(Appointment.status, func.count()).group_by(Appointment.status)).all()
     by_status = {s: 0 for s in STATUS_VALUES}
     for s, cnt in rows:
         by_status[s] = cnt
@@ -78,9 +76,7 @@ def create_appointment(body: AppointmentCreate, db: Session = Depends(get_db)):
 
 
 @router.put("/{appointment_id}", response_model=AppointmentRead)
-def update_appointment(
-    appointment_id: int, body: AppointmentUpdate, db: Session = Depends(get_db)
-):
+def update_appointment(appointment_id: int, body: AppointmentUpdate, db: Session = Depends(get_db)):
     appt = db.get(Appointment, appointment_id)
     if not appt:
         raise HTTPException(status_code=404, detail="Appointment not found")

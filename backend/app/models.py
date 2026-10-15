@@ -21,18 +21,12 @@ class Appointment(Base):
     # Core fields
     patient_name: Mapped[str] = mapped_column(String(200), nullable=False)
     doctor: Mapped[str] = mapped_column(String(200), nullable=False)
-    scheduled_at: Mapped[str] = mapped_column(
-        DateTime(timezone=True), nullable=False
-    )
+    scheduled_at: Mapped[str] = mapped_column(DateTime(timezone=True), nullable=False)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Status & priority — stored as plain strings, enforced by Pydantic
-    status: Mapped[str] = mapped_column(
-        String(20), nullable=False, server_default="scheduled"
-    )
-    priority: Mapped[str] = mapped_column(
-        String(20), nullable=False, server_default="normal"
-    )
+    status: Mapped[str] = mapped_column(String(20), nullable=False, server_default="scheduled")
+    priority: Mapped[str] = mapped_column(String(20), nullable=False, server_default="normal")
 
     # Audit timestamps
     created_at: Mapped[str] = mapped_column(
