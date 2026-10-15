@@ -1,0 +1,39 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# ── Environment / secrets ─────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example       # keep the example in Git
+
+# ── Node ──────────────────────────────────────────────────────────────────────
+node_modules/
+dist/
+
+# ── Terraform ─────────────────────────────────────────────────────────────────
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+terraform.tfvars    # real vars → secrets; use terraform.tfvars.example instead
+crash.log
+# .terraform.lock.hcl is intentionally NOT ignored (pin provider versions in Git)
+
+# ── Kubernetes ────────────────────────────────────────────────────────────────
+kubeconfig*
+
+# ── Secrets / keys ────────────────────────────────────────────────────────────
+*.pem
+*.key
+
+# ── OS / IDE ──────────────────────────────────────────────────────────────────
+.DS_Store
+.idea/
+*.swp
