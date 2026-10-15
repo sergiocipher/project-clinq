@@ -21,7 +21,12 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # ── Application source ────────────────────────────────────────────────────────
-COPY alembic.ini alembic/ app/ start.sh ./
+# Note: alembic/ must be copied separately so Docker preserves it as a
+# subdirectory at /app/alembic/. Mixing it with other sources in one COPY
+# causes Docker to flatten its contents directly into /app/.
+COPY alembic.ini start.sh ./
+COPY alembic/ ./alembic/
+COPY app/ ./app/
 
 # Build-time version label (CI passes the git SHA)
 ARG APP_VERSION=dev
