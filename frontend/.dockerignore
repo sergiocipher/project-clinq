@@ -1,0 +1,8 @@
+# WHY THIS FILE EXISTS:
+# Keeps build-time node_modules and local artefacts out of the Docker context.
+node_modules/
+dist/
+.env
+.env.*
+*.md
+.git/
