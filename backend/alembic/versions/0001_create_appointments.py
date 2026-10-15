@@ -15,6 +15,7 @@ fully reversible during development.
 from typing import Sequence, Union
 
 import sqlalchemy as sa
+
 from alembic import op
 
 revision: str = "0001"
@@ -58,9 +59,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(op.f("ix_appointments_id"), "appointments", ["id"], unique=False)
-    op.create_index(
-        "ix_appointments_status", "appointments", ["status"], unique=False
-    )
+    op.create_index("ix_appointments_status", "appointments", ["status"], unique=False)
 
 
 def downgrade() -> None:

@@ -3,3 +3,5 @@ target-version = "py312"
 
 [lint]
 select = ["E", "F", "I", "B"]
+# B008: FastAPI's Depends() in function signatures is idiomatic and intentional.
+ignore = ["B008"]
