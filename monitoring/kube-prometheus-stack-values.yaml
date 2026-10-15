@@ -1,0 +1,36 @@
+# WHY THIS FILE EXISTS:
+# Customises the kube-prometheus-stack Helm chart for this project.
+# Key settings:
+# - serviceMonitorSelectorNilUsesHelmValues: false — without this, Prometheus
+#   ignores ServiceMonitors that don't have the chart's own release label.
+# - alertmanager disabled — saves resources; not needed for the capstone.
+# - short retention — we only need a few hours of data for the demo.
+# - Grafana password is NOT set here — pass it at install time with
+#   --set grafana.adminPassword=<your-password> to keep it out of Git.
+
+prometheus:
+  prometheusSpec:
+    # Allow Prometheus to pick up ALL ServiceMonitors in the cluster,
+    # not just ones with the kube-prometheus-stack release label
+    serviceMonitorSelectorNilUsesHelmValues: false
+    retention: 6h
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+alertmanager:
+  enabled: false   # not required for the capstone; saves resources
+
+grafana:
+  service:
+    type: ClusterIP   # access via port-forward; no public LB needed
+  # adminPassword is intentionally NOT set here — pass via --set at install
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      searchNamespace: ALL   # pick up ConfigMaps from any namespace

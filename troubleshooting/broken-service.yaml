@@ -1,0 +1,40 @@
+# WHY THIS FILE EXISTS:
+# A Deployment + Service with a deliberately wrong selector — the Service label
+# does not match the pod label, so the Service has no endpoints and traffic
+# never reaches the pod.
+# Use this to practice diagnosing and fixing a "Service has no endpoints" issue.
+#
+# To apply:   kubectl apply -f troubleshooting/broken-service.yaml
+# To clean up: kubectl delete ns troubleshooting-lab   (or just the resources)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken-service-app
+  namespace: troubleshooting-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: broken-service-app
+  template:
+    metadata:
+      labels:
+        app: broken-service-app   # <-- pod has this label
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: broken-service
+  namespace: troubleshooting-lab
+spec:
+  selector:
+    app: wrong-label   # <-- intentionally wrong! does not match pod label above
+  ports:
+    - port: 80
+      targetPort: 80

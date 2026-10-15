@@ -1,0 +1,34 @@
+# WHY THIS FILE EXISTS:
+# Intentionally broken Deployment that references a non-existent image tag.
+# Use this to practice diagnosing and fixing an ImagePullBackOff error.
+# Apply to the troubleshooting-lab namespace (created below) so it never
+# touches the real project-clinq namespace.
+#
+# To apply:   kubectl apply -f troubleshooting/broken-image.yaml
+# To clean up: kubectl delete ns troubleshooting-lab
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: troubleshooting-lab
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken-image
+  namespace: troubleshooting-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: broken-image
+  template:
+    metadata:
+      labels:
+        app: broken-image
+    spec:
+      containers:
+        - name: app
+          # This image tag does not exist — it will cause ImagePullBackOff
+          image: nginx:this-tag-does-not-exist-99999
+          ports:
+            - containerPort: 80
