@@ -15,6 +15,11 @@ statuses: `scheduled → completed / cancelled`. A dashboard shows live KPI
 counts, a filterable/searchable table, and a recent-activity feed.
 
 ---
+| Deliverable | Location |
+|---|---|
+| Slide deck (PDF) | [demo/ClinQ_DevOps_Project_Report.pdf](demo/ClinQ_DevOps_Project_Report.pdf) |
+| Screenshots | [evidence/](evidence/) |
+---
 
 ## Architecture
 
