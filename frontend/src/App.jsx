@@ -90,7 +90,7 @@ export default function App() {
       {/* ── Sidebar ─────────────────────────────────────────── */}
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <h1>ClinQ</h1>
+          <h1>ClinQ ✓</h1>
           <p>Appointment Booking</p>
         </div>
         <nav className="sidebar-nav">
