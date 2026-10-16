@@ -9,12 +9,18 @@ dependencies (Python packages from `requirements.txt`, Node modules from
 
 ## What the result means
 
-<!-- Student: fill in after your first successful Actions run.
-     Example: "Both images passed with no HIGH or CRITICAL findings.
-     The base images python:3.12-slim and nginxinc/nginx-unprivileged:1.27-alpine
-     had no known unfixed vulnerabilities at the time of this scan." -->
+Both images passed with 0 HIGH or CRITICAL findings after fixes were applied.
 
-_TODO: paste your result here after the first green pipeline run._
+The **backend image** (python:3.12-slim / Debian) initially failed with 3 HIGH
+CVEs in `starlette==0.38.6` (CVE-2024-47874, CVE-2026-48818, CVE-2026-54283 —
+DoS and SSRF vulnerabilities). These were fixed by upgrading to
+`fastapi==0.143.2` and pinning `starlette==1.3.1`, which contains all patches.
+
+The **frontend image** initially used `nginxinc/nginx-unprivileged:1.27-alpine`
+(Alpine 3.21.3) which had 41 HIGH/CRITICAL CVEs across OS packages including
+`openssl`, `musl`, `libxml2`, `libexpat`, `libpng`, `c-ares`, and `zlib`.
+The root cause was a stale base image. Bumping to `1.30.1-alpine3.23` (Alpine 3.23)
+and adding `apk upgrade --no-cache` cleared all 41 findings.
 
 ## Why scan before push?
 
