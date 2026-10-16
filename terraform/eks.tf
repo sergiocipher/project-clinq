@@ -15,7 +15,7 @@ module "eks" {
 
   # Nodes go in private subnets; control plane in VPC subnets
   vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.private_subnet_ids
+  subnet_ids = module.vpc.private_subnets
 
   # Public endpoint so kubectl works from a laptop
   cluster_endpoint_public_access = true
