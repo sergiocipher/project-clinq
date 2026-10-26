@@ -39,3 +39,6 @@ kubeconfig*
 .DS_Store
 .idea/
 *.swp
+
+agent.md
+terraform/terraform.tfvars
