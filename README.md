@@ -18,7 +18,8 @@ counts, a filterable/searchable table, and a recent-activity feed.
 | Deliverable | Location |
 |---|---|
 | Slide deck (PDF) | [demo/](demo/ClinQ_DevOps_Project_Report.pdf) |
-| Screenshots | [evidence/](evidence/) |
+| Screenshots | [demo/evidence/](demo/evidence/) |
+| Presentation video | [demo/](https://drive.google.com/file/d/1UFP7JX6Tqs6rh18jXMhPdy_G55cMp1Kt/view?usp=sharing) |
 ---
 
 ## Architecture
